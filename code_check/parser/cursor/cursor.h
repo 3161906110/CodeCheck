@@ -25,6 +25,8 @@ public:
     List getChildren(void) const;
     void visitChildren(Visitor visitor, void* data = nullptr);
 
+    void getIntValue() const;
+
 private:
     CXCursor m_handle;
 };

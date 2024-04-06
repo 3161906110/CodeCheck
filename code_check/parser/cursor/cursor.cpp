@@ -71,3 +71,27 @@ Cursor::List Cursor::getChildren(void) const
 }
 
 void Cursor::visitChildren(Visitor visitor, void* data) { clang_visitChildren(m_handle, visitor, data); }
+
+void Cursor::getIntValue(void) const
+{
+    if (getKind() != CXCursor_IntegerLiteral)
+    {
+        return;
+    }
+    CXSourceRange range = clang_getCursorExtent(m_handle);
+    CXToken* tokens = 0;
+    unsigned int nTokens = 0;
+    CXTranslationUnit tu = clang_Cursor_getTranslationUnit(m_handle);
+    clang_tokenize(tu, range, &tokens, &nTokens);
+    for (unsigned int i = 0; i < nTokens; ++i)
+    {
+        CXString spelling = clang_getTokenSpelling(tu, tokens[i]);
+        std::string str_spelling;
+        Utils::toString(spelling, str_spelling);
+        std::cout << str_spelling;
+    }
+
+    //auto res = clang_Cursor_Evaluate(m_handle);
+    //auto value = clang_EvalResult_getAsInt(res);
+    //clang_EvalResult_dispose(res);
+}

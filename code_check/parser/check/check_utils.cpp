@@ -34,6 +34,11 @@ namespace Utils
         {
             std::cout << "-";
         }
+        if (node.getKind() == CXCursor_IntegerLiteral)
+        {
+            //node.getIntValue();
+            //std::cout << node.getIntValue() << std::endl;
+        }
 
         std::cout << clang_getCString(clang_getCursorKindSpelling(node.getKind())) << ":   " << node.getSpelling()  << std::endl;
         for(auto& child: node.getChildren())
