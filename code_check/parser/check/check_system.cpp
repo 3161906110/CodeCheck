@@ -31,19 +31,25 @@ void CodeCheckSystem::run()
 
 void CodeCheckSystem::initPass()
 {
-
+    check_pass_list.insert(check_pass_list.end(), { 
+        new CheckPassBase(),
+    });
 }
 
 void CodeCheckSystem::destroyPass()
 {
-    
+    for (auto check_pass : check_pass_list)
+    {
+        delete check_pass;
+    }
+    check_pass_list.clear();
 }
 
 void CodeCheckSystem::checkFile(std::string file_name)
 {
-    bool is_show_errors = false;
+    bool is_show_errors = true;
 
-    CXIndex cur_index = clang_createIndex(true, false);
+    CXIndex cur_index = clang_createIndex(true, is_show_errors);
 
     fs::path input_path(file_name);
     if (!fs::exists(input_path))
@@ -62,10 +68,18 @@ void CodeCheckSystem::checkFile(std::string file_name)
                                            "-MG",
                                            "-M",
                                            "-ferror-limit=0",
+                                           "-fsyntax-only",
                                            "-o clangLog.txt"}};
     auto translation_unit = clang_createTranslationUnitFromSourceFile(
         cur_index, file_name.c_str(), static_cast<int>(arguments.size()), arguments.data(), 0, nullptr);
     auto cursor = clang_getTranslationUnitCursor(translation_unit);
-    Utils::debugAst(Cursor(cursor), 0);
+    Cursor& root = Cursor(cursor);
+    for (auto& child : root.getChildren())
+    {
+        if (Utils::checkNodeInFile(child, file_name)) 
+        {
+            Utils::debugAst(child, 1);
+        }
+    }
 
  }

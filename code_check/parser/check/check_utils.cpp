@@ -21,7 +21,7 @@ namespace Utils
             return true;
         }
         std::string source_file = node.getSourceFile();
-        if (source_file == file_path)
+        if (source_file != file_path)
         {
             return false;
         }
